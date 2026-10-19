@@ -1,5 +1,14 @@
 # GearShare
 
+[![CI](https://github.com/<your-username>/GearShare/actions/workflows/ci.yml/badge.svg)](https://github.com/TaylorBrown96/GearShare/actions/workflows/ci.yml)
+![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)
+![C# 14](https://img.shields.io/badge/C%23-14-239120)
+![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-Web_API-512BD4)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker_Compose-2496ED?logo=docker&logoColor=white)
+![Status](https://img.shields.io/badge/status-M1_in_progress-yellow)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 GearShare is an equipment lending API built with ASP.NET Core and PostgreSQL. Members reserve gear like cameras, tools, and camping equipment for date ranges, staff check items out and back in, and the system handles waitlists, late fees, maintenance, and reporting.
 
 The interesting parts are the rules: no double bookings (even when two people reserve at the same moment), status changes that must happen in order, exact money math, and background jobs that never run the same work twice.
@@ -60,7 +69,7 @@ Then open the API docs at `https://localhost:<port>/scalar`.
 dotnet test
 ```
 
-Integration tests start their own PostgreSQL container, so Docker must be running.
+Integration tests start their own PostgreSQL container, so Docker must be running. The same tests run on every push and pull request through GitHub Actions.
 
 ## Milestones
 

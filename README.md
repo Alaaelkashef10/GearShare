@@ -1,6 +1,6 @@
 # GearShare
 
-[![CI](https://github.com/<your-username>/GearShare/actions/workflows/ci.yml/badge.svg)](https://github.com/TaylorBrown96/GearShare/actions/workflows/ci.yml)
+[![CI](https://github.com/TaylorBrown96/GearShare/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/TaylorBrown96/GearShare/actions/workflows/ci.yml)
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)
 ![C# 14](https://img.shields.io/badge/C%23-14-239120)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-Web_API-512BD4)

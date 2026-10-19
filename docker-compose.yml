@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:17
+    container_name: gearshare-db
+    environment:
+      POSTGRES_USER: gearshare
+      POSTGRES_PASSWORD: gearshare_dev
+      POSTGRES_DB: gearshare
+    ports:
+      - "5432:5432"
+    volumes:
+      - gearshare-data:/var/lib/postgresql/data
+
+volumes:
+  gearshare-data:

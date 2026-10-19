@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/GearShare.Application/GearShare.Application.csproj" />
     <Project Path="src/GearShare.Infrastructure/GearShare.Infrastructure.csproj" />

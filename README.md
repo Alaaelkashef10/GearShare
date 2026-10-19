@@ -84,4 +84,5 @@ Each milestone is tagged in Git (`m1`, `m2`, ...) when it's done.
 
 ## Design decisions
 
+The full assignment spec, including requirements, edge cases, and endpoints, is in [docs/SPEC.md](docs/SPEC.md).
 Choices this project made where the spec left room, and why, are recorded in [DECISIONS.md](DECISIONS.md).

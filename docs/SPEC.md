@@ -1,11 +1,11 @@
-# GearShare: C# Equipment Lending Assignment
+# GearShare: Project Specification
 
-The full specification for this project: requirements, user stories, edge cases, data model, endpoints, and milestones. Written October 16, 2026.
+I wrote this spec before writing any code, to treat GearShare like a real product with real requirements rather than a tutorial. It covers requirements, user stories, edge cases, data model, endpoints, and milestones, and it's the source of truth for every issue in this repo. Written October 16, 2026.
 
 ## Contents
 
 - [Overview](#overview)
-- [Tech requirements and ground rules](#tech-requirements-and-ground-rules)
+- [Tech requirements and principles](#tech-requirements-and-principles)
 - [User roles](#user-roles)
 - [User stories](#user-stories)
 - [Functional requirements](#functional-requirements)
@@ -15,18 +15,18 @@ The full specification for this project: requirements, user stories, edge cases,
 - [Minimum data model](#minimum-data-model)
 - [Required API endpoints](#required-api-endpoints)
 - [Milestones](#milestones)
-- [Self-grading rubric](#self-grading-rubric)
-- [Stretch goals](#stretch-goals)
-- [Suggested packages and frameworks](#suggested-packages-and-frameworks)
+- [Quality bar](#quality-bar)
+- [Future work](#future-work)
+- [Tech stack and packages](#tech-stack-and-packages)
 - [Sources](#sources)
 
 ## Overview
 
-You will build **GearShare**, a C# web API backed by a relational database that lets a club, makerspace, or office lend out equipment like cameras, tools, and camping gear. Members reserve items for date ranges, staff check items out and back in, and the system tracks condition, maintenance, late fees, and a waitlist.
+**GearShare** is a C# web API backed by a relational database that lets a club, makerspace, or office lend out equipment like cameras, tools, and camping gear. Members reserve items for date ranges, staff check items out and back in, and the system tracks condition, maintenance, late fees, and a waitlist.
 
-The basic create/read/update/delete part is easy on purpose. The real work is in the rules: no double bookings, two people hitting "reserve" at the same moment, status changes that must happen in the right order, and money math that has to be exact.
+I chose this domain on purpose. The create/read/update/delete part is simple, so the real work is in the rules: no double bookings, two people hitting "reserve" at the same moment, status changes that must happen in the right order, and money math that has to be exact.
 
-Skills this assignment exercises:
+What this project is built to show:
 
 - Relational data modeling, migrations, indexes, and constraints
 - Transactions and concurrency control
@@ -37,26 +37,26 @@ Skills this assignment exercises:
 - Unit tests plus integration tests against a real database
 - Structured logging and a clean, layered project layout
 
-## Tech requirements and ground rules
+## Tech requirements and principles
 
-Build on .NET 10 with C# 14. It is the current Long Term Support release, supported until November 10, 2028, and it needs Visual Studio 2026, VS Code with C# Dev Kit, or Rider ([source](https://aspnetzero.com/blog/what-.net-10-lts-means-for-enterprise-applications)).
+GearShare targets .NET 10 with C# 14, the current Long Term Support release, supported until November 10, 2028 ([source](https://aspnetzero.com/blog/what-.net-10-lts-means-for-enterprise-applications)).
 
 | Area | Requirement |
 | --- | --- |
 | Runtime | .NET 10 SDK, C# 14 |
-| API | ASP.NET Core Web API. Controllers or Minimal APIs, your choice. |
-| Database | PostgreSQL recommended. SQL Server is fine. SQLite allowed for Milestone 1 only. |
+| API | ASP.NET Core Web API with controllers |
+| Database | PostgreSQL |
 | Data access | EF Core with code-first migrations. Raw SQL or Dapper allowed for reports. |
-| Tests | Unit tests plus integration tests that run against the same database engine you use for real |
+| Tests | Unit tests plus integration tests that run against the same database engine used in production |
 | Source control | Git, at least one tagged commit per milestone, and a README |
 | Local setup | Database runs from a docker compose file, so a fresh clone works in a few commands |
 
-Ground rules:
+Principles:
 
 - Business rules live in a service or domain layer, not in controllers.
 - Never trust the client. Every rule in this spec is enforced on the server.
-- When this spec leaves a choice open, record it in a `DECISIONS.md` file with one line on why. These make good interview talking points.
-- Try each milestone on your own before looking at full solutions. Official docs and library samples are fair game.
+- When this spec leaves a choice open, the decision and the reason go in [DECISIONS.md](../DECISIONS.md).
+- The database backs up the code. Rules like "no overlapping reservations" are enforced by constraints, not just by checks in C#.
 
 ## User roles
 
@@ -224,7 +224,7 @@ Any status change not listed here is rejected with 409 Conflict.
 
 ## Business rules and default settings
 
-These defaults are seeded into the settings table and drive every rule check. Your tests should read them from settings, not hard-code them.
+These defaults are seeded into the settings table and drive every rule check. Tests read them from settings rather than hard-coding them.
 
 | Setting | Default | Notes |
 | --- | --- | --- |
@@ -325,16 +325,16 @@ Every one of these 41 cases needs at least one automated test. Status codes: 400
 
 ## Non-functional requirements
 
-These cover how well the system is built, and each one has a concrete way to prove you met it.
+These cover how well the system is built, and each one has a concrete way to verify it.
 
-| ID | Requirement | How you prove it |
+| ID | Requirement | How it's verified |
 | --- | --- | --- |
 | NFR-1 | Separate projects for API, application/domain logic, and data access. Endpoints hold no business rules. | Folder layout plus a quick code read |
 | NFR-2 | Money is stored as `numeric(10,2)` (or `decimal(10,2)`) and handled as C# `decimal` | Schema and code |
 | NFR-3 | Timestamps are stored in UTC. Reservation dates are stored as a date type with no time. | Schema plus EC-05 and EC-06 tests |
 | NFR-4 | All errors use the ProblemDetails format with a trace ID | One integration test per status code checks the shape |
 | NFR-5 | Structured logs carry a request ID. Passwords and tokens never appear in logs. | Read the logs from a test run |
-| NFR-6 | Search answers in under 300 ms (95th percentile) with 10,000 items and 100,000 reservations seeded | Seed script, timing results, and the indexes you added |
+| NFR-6 | Search answers in under 300 ms (95th percentile) with 10,000 items and 100,000 reservations seeded | Seed script, timing results, and the indexes added |
 | NFR-7 | Integration tests run against a real database in a container, not EF's in-memory provider | Test project setup |
 | NFR-8 | Test names reference the FR or EC IDs they cover | Search the test project for each ID |
 | NFR-9 | An OpenAPI document is generated and browsable in development | Open it in the browser |
@@ -344,7 +344,7 @@ These cover how well the system is built, and each one has a concrete way to pro
 
 ## Minimum data model
 
-You need at least these 10 tables. Column names, extra tables, and exact types are your design.
+The schema has at least these 10 tables. Exact column names and types are settled during implementation.
 
 | Entity | Must store | Constraints the database enforces |
 | --- | --- | --- |
@@ -359,11 +359,11 @@ You need at least these 10 tables. Column names, extra tables, and exact types a
 | Setting | Key, value, who changed it and when | Unique key |
 | AuditLog | Who, when, entity type and ID, action, old and new values as JSON | No updates or deletes allowed |
 
-**Hints:** look up PostgreSQL exclusion constraints with `daterange` for the overlap rule, and partial unique indexes for "one open record per item." On SQL Server, research serializable transactions or `UPDLOCK` hints instead.
+**Implementation notes:** the overlap rule uses a PostgreSQL exclusion constraint on a `daterange`, and "one open record per item" uses a partial unique index.
 
 ## Required API endpoints
 
-These 32 routes are the minimum. You can rename them if you note why in DECISIONS.md.
+These 32 routes are the minimum. Any route that changes from this list is noted in DECISIONS.md.
 
 | Method | Route | Who | Covers |
 | --- | --- | --- | --- |
@@ -402,7 +402,7 @@ These 32 routes are the minimum. You can rename them if you note why in DECISION
 
 ## Milestones
 
-Build it in 6 rounds. Finish and tag each one in Git before starting the next, then review your own code against the spec before moving on.
+GearShare is built in 6 milestones. Each one is finished, reviewed against this spec, and tagged in Git (`m1`, `m2`, ...) before the next one starts. Progress is tracked in the repo's GitHub milestones and issues.
 
 1. **M1 Foundation.** Solution layout, docker compose database, EF Core migrations, Category and Item CRUD, basic search and paging, seed data, OpenAPI page, first tests.
     - Done when: a fresh clone runs, migrations build an empty database, and EC-36 to EC-41 pass.
@@ -417,9 +417,9 @@ Build it in 6 rounds. Finish and tag each one in Git before starting the next, t
 6. **M6 Settings, reports, audit, performance.** Seed 100,000 reservations, add indexes, finish the README.
     - Done when: FR-9 to FR-11 are complete and every NFR is met.
 
-## Self-grading rubric
+## Quality bar
 
-Score yourself out of 100 at the end of each milestone. 90 or above means the project is ready to show in a portfolio or interview.
+Each milestone is reviewed against this rubric and scored out of 100. The target is 90 or above before moving on.
 
 | Category | Points | What full marks look like |
 | --- | --- | --- |
@@ -431,14 +431,14 @@ Score yourself out of 100 at the end of each milestone. 90 or above means the pr
 | Docs and setup | 10 | README, DECISIONS.md, one-command database, clean migrations |
 | Security | 5 | Hashed passwords, role check on every route, no secrets in Git |
 
-## Stretch goals
+## Future work
 
-Pick these up only after M6 is done.
+Ideas planned for after M6.
 
 - A Blazor or React front end for members and staff
 - Reservation extensions for checked-out items, with the same overlap rules
 - Real email to a local test inbox
-- GitHub Actions CI that runs every test, including container-based integration tests, on each push
+- Expand CI with test coverage reports and a required status check on every pull request
 - Rate limiting on login and reserve endpoints using ASP.NET Core's built-in rate limiter
 - Item photo uploads with file size and type checks
 - Rewrite one report with raw SQL and compare timing and query plans against the EF Core version
@@ -446,16 +446,16 @@ Pick these up only after M6 is done.
 - Package the API as a container image and deploy it to a Linux server
 - Health check endpoints and OpenTelemetry tracing
 
-## Suggested packages and frameworks
+## Tech stack and packages
 
-The core stack is ASP.NET Core 10, EF Core 10, and PostgreSQL through Npgsql. Everything else below solves one specific problem from this spec.
+The core stack is ASP.NET Core 10, EF Core 10, and PostgreSQL through Npgsql. Each package below was picked to solve a specific requirement in this spec.
 
 ### Building the app
 
-| Package | Use it for | First needed |
+| Package | Used for | Milestone |
 | --- | --- | --- |
 | Microsoft.EntityFrameworkCore, Microsoft.EntityFrameworkCore.Design, `dotnet-ef` tool | ORM and migrations | M1 |
-| Npgsql.EntityFrameworkCore.PostgreSQL | PostgreSQL provider. Supports range types, which you need for the overlap constraint. | M1 |
+| Npgsql.EntityFrameworkCore.PostgreSQL | PostgreSQL provider. Supports range types, which the overlap constraint needs. | M1 |
 | Microsoft.AspNetCore.OpenApi | Generates the OpenAPI document. It replaced Swashbuckle in the templates in .NET 9, and .NET 10 outputs OpenAPI 3.1 ([source](https://scalar.com/blog/posts/2026-10-06-openapi-aspnet-core-dotnet-9-10)). | M1 |
 | Scalar.AspNetCore | A browsable API page on top of that document, since the built-in package ships no UI | M1 |
 | FluentValidation plus FluentValidation.DependencyInjectionExtensions | Request validation with clear per-field messages | M1 |
@@ -463,27 +463,27 @@ The core stack is ASP.NET Core 10, EF Core 10, and PostgreSQL through Npgsql. Ev
 | Microsoft.AspNetCore.Identity.EntityFrameworkCore | User storage, password hashing, login lockout | M2 |
 | Microsoft.AspNetCore.Authentication.JwtBearer | Token authentication | M2 |
 | Built-in `TimeProvider` plus Microsoft.Extensions.TimeProvider.Testing | An injectable clock. `FakeTimeProvider` lets tests set "now" to any moment. | M3 |
-| NodaTime (optional) | Stronger date and time zone types. Npgsql has a NodaTime plugin. | M3 |
-| Built-in `BackgroundService`, or Quartz.NET | Scheduled jobs. Quartz can run clustered, which helps with EC-11. | M5 |
+| NodaTime (if needed) | Stronger date and time zone types. Npgsql has a NodaTime plugin. | M3 |
+| Built-in `BackgroundService` or Quartz.NET (to be decided) | Scheduled jobs. Quartz can run clustered, which helps with EC-11. | M5 |
 | Dapper | Hand-written SQL for reports | M6 |
 | CsvHelper | CSV export | M6 |
 
 ### Testing
 
-| Package | Use it for | First needed |
+| Package | Used for | Milestone |
 | --- | --- | --- |
-| xunit.v3 (or NUnit) | Test framework | M1 |
+| xunit.v3 | Test framework | M1 |
 | Microsoft.AspNetCore.Mvc.Testing | `WebApplicationFactory` runs the whole API in memory for integration tests | M1 |
 | Testcontainers.PostgreSql | Starts a real PostgreSQL in Docker for the test run | M1 |
 | Respawn | Wipes test data between tests quickly | M1 |
 | Shouldly | Readable assertions | M1 |
 | NSubstitute | Fakes for unit tests | M3 |
 | Bogus | Realistic fake data for seeding 100,000 rows | M6 |
-| NetArchTest.Rules (optional) | Tests that enforce your layer rules (NFR-1) | M6 |
+| NetArchTest.Rules | Tests that enforce the layer rules (NFR-1) | M6 |
 
-**Skip AutoMapper and MediatR.** Since July 2025, their new major versions (AutoMapper 15+, MediatR 13+) use a dual license. A free Community edition covers individuals, companies under $5 million in revenue, education, and non-production use, but you still register for a key ([source](https://www.jimmybogard.com/automapper-and-mediatr-commercial-editions-launch-today/)). Writing your own mapping and handlers is better practice for this assignment anyway.
+**Not using AutoMapper or MediatR.** Since July 2025, their new major versions (AutoMapper 15+, MediatR 13+) use a dual commercial license ([source](https://www.jimmybogard.com/automapper-and-mediatr-commercial-editions-launch-today/)). Mapping and request handling are written by hand instead, which keeps the code explicit and easy to follow.
 
-**Tools:** Visual Studio 2026, VS Code with C# Dev Kit, or Rider; Docker Desktop; DBeaver or pgAdmin for looking at the database; `.http` files or Bruno for manual API calls.
+**Tools:** Visual Studio 2026, Docker Desktop, DBeaver for inspecting the database, and `.http` files for manual API calls.
 
 ## Sources
 

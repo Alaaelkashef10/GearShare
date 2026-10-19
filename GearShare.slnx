@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GearShare.Application/GearShare.Application.csproj" />
+    <Project Path="src/GearShare.Infrastructure/GearShare.Infrastructure.csproj" />
+    <Project Path="src/GearShare/GearShare.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GearShare.IntegrationTests/GearShare.IntegrationTests.csproj" />
+    <Project Path="tests/GearShare.UnitTests/GearShare.UnitTests.csproj" />
+  </Folder>
+</Solution>

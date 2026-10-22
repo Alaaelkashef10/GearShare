@@ -1,7 +1,21 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using GearShare.Infrastructure.Data;
+using GearShare.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+builder.Services.AddDbContext<GearShareDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddSingleton<ILookupNormalizer, TrimmedUpperLookupNormalizer>();
+
+builder.Services
+    .AddIdentityCore<AppUser>(options => options.User.RequireUniqueEmail = true)
+    .AddEntityFrameworkStores<GearShareDbContext>();
 
 var app = builder.Build();
 

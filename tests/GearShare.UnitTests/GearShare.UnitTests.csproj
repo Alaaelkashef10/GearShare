@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GearShare.Application\GearShare.Application.csproj" />
+    <ProjectReference Include="..\..\src\GearShare.Infrastructure\GearShare.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
